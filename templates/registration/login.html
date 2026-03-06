@@ -1,0 +1,41 @@
+{% extends "master/base.html" %}
+{% block content %}
+{% if form.errors %}
+<p> Your login and password don't match. Please try again.</p>
+{% endif %}
+
+{% if next %}
+    {% if user.is_authenticated %}
+        <p>You don't have access to this page. Login with different parameters </p>
+    {% else %}
+        <p>Login to  system to see the page</p>
+    {% endif %}
+{% endif %}
+<form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <div class="row my-2 text-center">
+        <div class="col-4">
+            <table class="table table-bordered my-2 text-start">
+                <tr>
+                    <td> {{ form.username.label_tag }}</td>
+                    <td> {{ form.username }}</td>
+                </tr>
+                <tr>
+                    <td> {{ form.password.label_tag }}</td>
+                    <td> {{ form.password }}</td>
+                </tr>
+
+            </table>
+        </div>
+        <div class="col-8"></div>
+    </div>
+        <div class="row my-2 text-start">
+            <div class="col-4">
+                <input type="submit" value="Login" />
+                <input type="hidden" name="next" value="{{next}}" />
+            </div>
+        </div>
+    <div class="col-8"></div>
+</form>
+
+{% endblock %}

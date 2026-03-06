@@ -1,0 +1,148 @@
+{% extends "master/base.html" %}
+
+{% load static %}
+
+{% block title %}{{ object.name }} - FoodStore{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Навигация -->
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none"><i class="bi bi-house"></i> Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'catalog:catalog_tree' %}" class="text-decoration-none">Каталог</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ object.name|truncatechars:30 }}</li>
+                </ol>
+            </nav>
+
+            <!-- Кнопка "Назад" -->
+            <a href="javascript:history.go(-1)" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Вернуться
+            </a>
+        </div>
+    </div>
+
+    <!-- Карточка товара -->
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card border-0 shadow-lg">
+                <div class="row g-0">
+                    <!-- Левая колонка - изображение -->
+                    <div class="col-md-6 p-4 bg-light">
+                        <div class="text-center">
+                            {% if object.image %}
+                                <img src="{{ object.image.url }}"
+                                     class="img-fluid rounded-3"
+                                     alt="{{ object.name }}"
+                                     style="max-height: 400px; object-fit: contain;">
+                            {% else %}
+                                <div class="bg-white rounded-3 d-flex align-items-center justify-content-center"
+                                     style="height: 400px;">
+                                    <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+                                    <p class="text-muted mt-2">Нет фото</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Правая колонка - информация -->
+                    <div class="col-md-6">
+                        <div class="card-body p-4">
+                            <!-- Категория -->
+                            <div class="mb-3">
+                                <span class="badge bg-info text-dark">
+                                    <i class="bi bi-tag"></i> {{ object.genre.name|default:"Без категории" }}
+                                </span>
+                            </div>
+
+                            <!-- Название товара -->
+                            <h1 class="display-6 fw-bold mb-3">{{ object.name }}</h1>
+
+
+                            <!-- Цена -->
+                            <div class="mb-4">
+                                <span class="display-5 fw-bold text-primary">{{ object.price }} ₽</span>
+                                <small class="text-muted ms-2">за шт.</small>
+                            </div>
+
+
+
+                            <!-- Описание -->
+                            <div class="mb-4">
+                                <h5 class="fw-bold">Описание</h5>
+                                <p class="text-muted">{{ object.description|linebreaks }}</p>
+                            </div>
+
+                            <!-- Характеристики (если есть) -->
+                            {% if object.characteristics %}
+                            <div class="mb-4">
+                                <h5 class="fw-bold">Характеристики</h5>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td>Артикул:</td>
+                                        <td><strong>{{ object.article|default:"—" }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Производитель:</td>
+                                        <td><strong>{{ object.manufacturer|default:"—" }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Страна производства:</td>
+                                        <td><strong>{{ object.country|default:"—" }}</strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            {% endif %}
+
+                            <!-- Кнопки действий -->
+                            <div class="d-flex gap-2 mt-4">
+                                <!-- Кнопка в корзину -->
+                                <a href="{% url 'catalog:cart' id=object.id %}"
+                                   class="btn btn-success btn-lg flex-grow-1">
+                                    <i class="bi bi-cart-plus"></i> В корзину
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Дополнительные стили для этой страницы -->
+<style>
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+    }
+    .breadcrumb-item a {
+        color: #0d6efd;
+    }
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    .btn-lg {
+        padding: 12px 24px;
+        border-radius: 10px;
+    }
+    @media (max-width: 768px) {
+        .display-6 {
+            font-size: 1.5rem;
+        }
+        .display-5 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}

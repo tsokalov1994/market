@@ -1,0 +1,90 @@
+{% load static %}
+
+{% if products %}
+    {% for product in products %}
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
+        <div class="card h-100 shadow-sm hover-shadow-lg transition-all">
+            <!-- Изображение товара -->
+            <div class="position-relative">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+                     style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center"
+                     style="height: 200px;">
+                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                </div>
+                {% endif %}
+
+                <!-- Бейдж цены -->
+                <span class="position-absolute top-0 end-0 bg-primary text-white px-2 py-1 m-2 rounded-pill small">
+                    {{ product.price }} ₽
+                </span>
+            </div>
+
+            <!-- Информация о товаре -->
+            <div class="card-body">
+                <h6 class="card-title mb-1">
+                    <a href="{% url 'catalog:product_detail' product.id %}" class="text-decoration-none text-dark">
+                        {{ product.name }}
+                    </a>
+                </h6>
+                <p class="text-muted small mb-2">
+                    <i class="bi bi-tag"></i> {{ product.genre.name|default:"Без категории" }}
+                </p>
+
+                <!-- Кнопка добавления в корзину -->
+                <div class="d-grid">
+                    <a href="{% url 'catalog:cart' id=product.id %}"
+                       class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-cart-plus"></i> В корзину
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Пагинация -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="col-12 mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+{% else %}
+<div class="col-12 text-center py-5">
+    <i class="bi bi-emoji-frown display-1 text-muted"></i>
+    <h4 class="mt-3">Товары не найдены</h4>
+    <p class="text-muted">Попробуйте выбрать другую категорию</p>
+    <a href="{% url 'catalog:catalog_tree' %}" class="btn btn-primary">
+        <i class="bi bi-arrow-left"></i> Вернуться в каталог
+    </a>
+</div>
+{% endif %}

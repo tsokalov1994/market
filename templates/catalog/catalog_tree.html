@@ -1,0 +1,139 @@
+{% extends "catalog/catalog_products.html" %}
+{% load static %}
+{% load mptt_tags %}
+
+{% block catalog %}
+<style>
+    /* Стили для древовидного меню */
+    .tree-menu {
+        font-size: 0.9rem;
+    }
+    .tree-menu ul {
+        list-style-type: none;
+        padding-left: 1.2rem;
+        margin: 0;
+    }
+    .tree-menu li {
+        margin: 0.3rem 0;
+        position: relative;
+    }
+    .tree-menu .category-link {
+        color: #2c3e50;
+        text-decoration: none;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+    .tree-menu .category-link:hover {
+        background-color: #e9ecef;
+        color: #0d6efd;
+        transform: translateX(3px);
+    }
+    .tree-menu .category-link.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    .caret {
+        cursor: pointer;
+        user-select: none;
+        color: #6c757d;
+        font-size: 0.85rem;
+        display: inline-block;
+        padding: 0.2rem 0;
+    }
+    .caret::before {
+        content: "\f231";  /* Bootstrap icon chevron-right */
+        font-family: "bootstrap-icons";
+        color: #0d6efd;
+        display: inline-block;
+        margin-right: 6px;
+        font-size: 0.75rem;
+        transition: transform 0.2s;
+    }
+    .caret-down::before {
+        transform: rotate(90deg);
+    }
+    .nested {
+        display: none;
+    }
+    .active {
+        display: block;
+    }
+    .leaf {
+        color: #adb5bd;
+        font-size: 0.8rem;
+        margin-left: 0.5rem;
+    }
+    .all-products-btn {
+        border: 2px dashed #0d6efd;
+        background-color: #f8f9fa;
+        color: #0d6efd;
+        font-weight: 500;
+        width: 100%;
+        text-align: left;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+    }
+    .all-products-btn:hover {
+        background-color: #0d6efd;
+        color: white;
+        border: 2px solid #0d6efd;
+    }
+</style>
+
+<div class="tree-menu">
+    <!-- Кнопка "Все товары" -->
+    <a href="{% url 'catalog:catalog_tree' %}" class="btn all-products-btn btn-sm">
+        <i class="bi bi-grid-3x3-gap-fill me-2"></i>Все товары
+    </a>
+
+    <!-- Древовидное меню категорий -->
+    <ul id="myUL" class="p-0">
+        {% recursetree genre_m %}
+        <li>
+            <!-- Ссылка на категорию -->
+            <a href="{% url 'catalog:product_tree' id=node.id %}"
+               class="category-link {% if node.id == id_cat %}active{% endif %}">
+                <i class="bi bi-folder{% if not node.is_leaf_node %}-2{% endif %} me-1"></i>
+                {{ node.name }}
+            </a>
+
+            {% if node.is_leaf_node %}
+                <span class="leaf">{{ node.code }}</span>
+            {% else %}
+                <span class="caret parent {% if node.id in opened_ids %}caret-down{% endif %}">
+                    <span class="text-muted small">({{ node.code }})</span>
+                </span>
+                <ul class="nested {% if node.id in opened_ids %}active{% endif %}">
+                    {{ children }}
+                </ul>
+            {% endif %}
+        </li>
+        {% endrecursetree %}
+    </ul>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var togglers = document.getElementsByClassName("caret");
+
+    for (var i = 0; i < togglers.length; i++) {
+        togglers[i].addEventListener("click", function(e) {
+            e.preventDefault();
+            var nested = this.parentElement.querySelector(".nested");
+            if (nested) {
+                nested.classList.toggle("active");
+                this.classList.toggle("caret-down");
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% block products %}
+<div class="row g-3">
+    {% include "catalog/user_product.html" %}
+</div>
+{% endblock %}
